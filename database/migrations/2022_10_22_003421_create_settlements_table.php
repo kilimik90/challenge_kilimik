@@ -14,7 +14,8 @@ class CreateSettlementsTable extends Migration
     public function up()
     {
         Schema::create('settlements', function (Blueprint $table) {
-            $table->unsignedBigInteger('key')->primary();
+            $table->id();
+            $table->unsignedBigInteger('key');
             $table->string('name');
             $table->string('zone_type');
             $table->string('locality_id');

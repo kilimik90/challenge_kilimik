@@ -16,6 +16,7 @@ class SettlementType extends Model
     protected $visible = ['name'];
 
     protected $fillable = [
+      'key',
       'name'
     ];
 

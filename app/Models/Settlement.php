@@ -43,6 +43,8 @@ class Settlement extends Model
         'municipality_id' => 'required',
     ];
 
+    protected $visible = ['key','name','zone_type','settlementType'];
+
     public function locality()
     {
         return $this->belongsTo(Locality::class,'locality_id');

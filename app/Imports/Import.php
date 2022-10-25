@@ -16,9 +16,11 @@ use Illuminate\Support\Str;
 class Import implements ToModel,WithHeadingRow
 {
 
+    public $replaceA = ['Á','É','Í','Ó','Ú','Ñ'];
+    public $replaceB = ['A','E','I','O','U','?'];
+
     public function model(array $row)
     {
-
         //creo settlement_types
         $st = SettlementType::updateOrCreate(
             ['key' => (int)$row['c_tipo_asenta']],
@@ -27,30 +29,30 @@ class Import implements ToModel,WithHeadingRow
         //creo federal_entities
         $fe = FederalEntity::updateOrCreate(
             ['key' => (int)$row['c_estado']],
-            ['name' => Str::upper($row['d_estado'])]
+            ['name' => Str::replace($this->replaceA,$this->replaceB,Str::upper($row['d_estado']))]
         );
         //creo municipalities
         $fe = Municipality::updateOrCreate(
             ['key' => (int)$row['c_mnpio']],
-            ['name' => Str::upper($row['d_mnpio']),'federal_entity_id' => (int)$row['c_estado']]
+            ['name' => Str::replace($this->replaceA,$this->replaceB,Str::upper($row['d_mnpio'])),'federal_entity_id' => (int)$row['c_estado']]
         );
         //creo localities
         $fe = Locality::updateOrCreate(
             ['zip_code' => $row['d_codigo']],
             [
-              'locality' => Str::upper(isset($row['d_ciudad'])?$row['d_ciudad']:'undefined'),'federal_entity_id' => (int)$row['c_estado'],
+              'locality' => Str::replace($this->replaceA,$this->replaceB,Str::upper(isset($row['d_ciudad'])?$row['d_ciudad']:'')),'federal_entity_id' => (int)$row['c_estado'],
               'municipality_id' => (int)$row['c_mnpio']
             ]
         );
         //creo el settlements
-        $fe = Settlement::updateOrCreate(
-            ['key' => (int)$row['id_asenta_cpcons']],
+        $fe = Settlement::create(
             [
-              'name' => Str::upper($row['d_asenta']),'zone_type' => Str::upper($row['d_zona']),
+              'name' => Str::replace($this->replaceA,$this->replaceB,Str::upper($row['d_asenta'])),'zone_type' => Str::replace($this->replaceA,$this->replaceB,Str::upper($row['d_zona'])) ,
               'locality_id' => $row['d_codigo'],
               'federal_entity_id'=>(int)$row['c_estado'],
               'settlement_type_id'=>(int)$row['c_tipo_asenta'],
-              'municipality_id'=>(int)$row['c_mnpio']
+              'municipality_id'=>(int)$row['c_mnpio'],
+              'key' => (int)$row['id_asenta_cpcons']
             ]
         );
 
